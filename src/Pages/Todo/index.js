@@ -7,13 +7,12 @@ import TodoList from './todoList';
 
 export default class Todo extends Component {
   state = {
-    todoList: [],
-    filterType: 'all',
-    error: null,
-    loading: false,
+    countries: [],
+    message: ''
   };
 
-  todoTextRef = createRef();
+  todotextCity = createRef();
+  todotextDegree = createRef();
 
   async componentDidMount() {
     this.loadData();
@@ -21,35 +20,34 @@ export default class Todo extends Component {
 
   loadData = async () => {
     try {
-      this.setState({
-        loading: true,
-      });
-      const res = await fetch('http://localhost:3000/todoList');
+      // this.setState({
+      //   loading: true,
+      // });
+      const res = await fetch('http://localhost:3000/Whether');
       const json = await res.json();
       this.setState({
-        todoList: json,
-        loading: false,
+        countries: json,
+        // loading: false,
       });
+      console.log('Countries are ' , json);
     } catch (error) {
       this.setState({
         error,
-        loading: false,
+        // loading: false,
       });
     }
   };
 
-  handleAddTodo = async event => {
+  handleWhether = async (event) => {
+    console.log('City and Degree are ',  this.todotextCity.current.value, ' and ', this.todotextDegree.current.value);
     try {
       event.preventDefault();
 
-      this.setState({
-        loading: true,
-      });
-      const res = await fetch('http://localhost:3000/todoList', {
+      const res = await fetch('http://localhost:3000/Whether', {
         method: 'POST',
         body: JSON.stringify({
-          text: this.todoTextRef.current.value,
-          isDone: false,
+          city: this.todotextCity.current.value,
+          degree: this.todotextDegree.current.value,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -60,87 +58,93 @@ export default class Todo extends Component {
       const json = await res.json();
 
       this.setState(
-        ({ todoList }) => ({
-          filterType: 'all',
-          todoList: [...todoList, json],
-          loading: false,
+        ({ countries }) => ({
+          countries: [...countries, json],
         }),
         () => {
-          this.todoTextRef.current.value = '';
-          // this.handleFilterTodo('all');
+          this.todotextCity.current.value = '';
+          this.todotextDegree.current.value = '';
         },
       );
     } catch (error) {
       this.setState({
         error,
-        loading: false,
       });
     }
   };
 
-  handleCompleteTodo = id => {
-    this.setState(({ todoList }) => ({
-      todoList: todoList.map(item => {
-        if (item.id === id) {
-          return { ...item, isDone: !item.isDone };
-        }
-        return item;
-      }),
-    }));
-  };
+  // handleCompleteTodo = id => {
+  //   this.setState(({ todoList }) => ({
+  //     todoList: todoList.map(item => {
+  //       if (item.id === id) {
+  //         return { ...item, isDone: !item.isDone };
+  //       }
+  //       return item;
+  //     }),
+  //   }));
+  // };
 
-  handleDeleteTodo = id => {
-    this.setState(({ todoList }) => ({
-      todoList: todoList.filter(item => item.id !== id),
-    }));
-  };
+  // handleDeleteTodo = id => {
+  //   this.setState(({ todoList }) => ({
+  //     todoList: todoList.filter(item => item.id !== id),
+  //   }));
+  // };
 
-  handleFilterTodo = filterType => {
-    this.setState({
-      filterType,
-    });
-  };
+  // handleFilterTodo = filterType => {
+  //   this.setState({
+  //     filterType,
+  //   });
+  // };
 
-  filteredTodo = () => {
-    const { todoList, filterType } = this.state;
-    return todoList.filter(item => {
-      switch (filterType) {
-        case 'pending':
-          return !item.isDone;
-        case 'completed':
-          return item.isDone;
-        default:
-          return true;
-      }
-    });
+  // filteredTodo = () => {
+  //   const { todoList, filterType } = this.state;
+  //   return todoList.filter(item => {
+  //     switch (filterType) {
+  //       case 'pending':
+  //         return !item.isDone;
+  //       case 'completed':
+  //         return item.isDone;
+  //       default:
+  //         return true;
+  //     }
+  //   });
+  // };
+
+  handleaddWhether = async event => {
+    console.log('Option is ', event.target.value);
+    
+    const res = await fetch(`http://localhost:3000/Whether/${Number(event.target.value)}`);
+      const json = await res.json();
+      this.setState({
+        message: 'Whether in ' + json.city + ' is ' + json.degree
+        // loading: false,
+      });
   };
 
   render() {
-    const { filterType, error, loading } = this.state;
-
-    if (error) {
-      return <h1>{error.message}</h1>;
-    }
-
+    const { countries } = this.state;
+    
     return (
       <div className="container">
-        <h1>Todo App</h1>
-        <TodoForm handleAddTodo={this.handleAddTodo} ref={this.todoTextRef} />
-        {loading ? (
-          <div className="todo-list">
-            <h1>Loading...</h1>
-          </div>
-        ) : (
-          <TodoList
-            todoList={this.filteredTodo()}
-            handleCompleteTodo={this.handleCompleteTodo}
-            handleDeleteTodo={this.handleDeleteTodo}
-          />
-        )}
-        <TodoFilter
-          filterType={filterType}
-          handleFilterTodo={this.handleFilterTodo}
-        />
+      <h1> Add Whether Details </h1>
+          <label className="todo-item"> City &nbsp;
+          </label>
+          <input type="text" ref={this.todotextCity} />
+          
+
+          <label className="todo-item"> Degree &nbsp;            
+          </label>
+          <input type="text" ref={this.todotextDegree} />
+
+          <button type="submit" onClick={() => this.handleWhether}> Add </button>
+
+        <h1> Whether Details </h1>
+        <select onChange={this.handleaddWhether}>
+          {countries.map((option) => (
+            <option value={option.id}>{option.city}</option>
+          ))}
+        </select>
+        <span className="todo-item"> {this.state.message} </span>
       </div>
     );
   }

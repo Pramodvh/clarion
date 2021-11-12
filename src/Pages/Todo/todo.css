@@ -16,7 +16,7 @@
   margin: 10px;
   display: flex;
   align-items: center;
-  flex: 1;
+  /* flex: 1; */
 }
 
 .todo-item > span {

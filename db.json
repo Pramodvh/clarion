@@ -10,5 +10,27 @@
       "isDone": false,
       "id": 3
     }
+  ],
+  "Whether": [
+    {
+      "id": 1,
+      "city": "Bangalore",
+      "degree": "30 degree"
+    },
+    {
+      "id": 2,
+      "city": "Mangalore",
+      "degree": "40 degree"
+    },
+    {
+      "id": 3,
+      "city": "Hubli",
+      "degree": "20 degree"
+    },
+    {
+      "id": 4,
+      "city": "Karwar",
+      "degree": "25 degree"
+    }
   ]
 }
